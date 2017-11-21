@@ -1,66 +1,57 @@
 package models
 
-
-//Someone who owns something
-type Proprietor interface {
-	//Check to see if this Landlord owns the Rental
-	HasRental(Rental) bool
-
-	//Check to see if this Landlord owns the Card
-	HasCard(Card) bool
-
-	//Receives assets
-	Receive(int64, []Rental, []Card)
-}
+import (
+	"fmt"
+)
 
 //Someone who owes something
 type Debtor interface {
-	//How much cash is available
-	Cash() int64
-
-	//Spends assets. Returns error if unable to spend
-	Spend(int64, []Rental, []Card) error
+	//Pays the given amount to the given Collector. Steps to ensure payment is made should be performed.
+	Pay(Collector, int64)
 }
 
-//Landlord collects assets
-type Landlord interface {
-
-
-
-
+//Collects assets
+type Collector interface {
+	//Receive assets as a one sided-exchange
+	Receive(int64, []Rental, []ConsumableCard)
 }
 
-//Renter pays
-type Renter interface {
-	//Declares bankruptcy and gives all assets to the Landlord
-	DeclareBankruptcy(Landlord)
-	//Pays a specific amount to the Landlord
-	PayRent(Landlord, int64)
+type Proprietor interface {
+	Debtor
+	Collector
 }
 
-//CardCollector collects cards
-type CardCollector interface {
-	//Collects a CollectibleCard
-	CollectCard(CollectibleCard)
-	//Uses a CollectibleCard
-	UseCard() bool
-	//Sells a a CollectibleCard for an amount
-	SellCards(int64)
+type Buyer interface {
+	WantToBuy(Rental) bool
 }
 
-//Player is a member of the game
-type Player struct {
-	cash int64
-	name string
-	properties PropertyManager
-	cards []CollectibleCard
-	piece GamePiece
-	inJail bool
-	jailRemaining int32
-	gm GameMaster
+type Prisoner interface {
+	InJail() bool
+	SentanceRemaining() int
+	PostBail()
 }
 
+type Builder interface {
+	//Builds a building in the given Rental Group.
+	Build(Group)
+}
 
-func NewPlayer(name string, piece GamePiece) *Player{
-	return &Player{name: name, piece: piece}
+type Player interface {
+	fmt.Stringer
+	Proprietor
+	Builder
+	Prisoner
+	Buyer
+}
+
+type Bank interface {
+	Proprietor
+	SellRental(Proprietor, Rental)
+	BuyHouse(Debtor, Buildable)
+	BuyHotel(Debtor, Buildable)
+	SellHouse(Collector, Buildable)
+	SellHotel(Collector, Buildable)
+	SellCard(Collector, ConsumableCard)
+	Mortgage(Collector, Rental)
+	Unmortgage(Debtor, Rental)
 }
