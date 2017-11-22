@@ -1,15 +1,7 @@
 package models
 
 
-func NewRentalProperty(name string, group Group, price, rent,  mortgage int64) Rental {
-	return &rentalProperty{
-		name:     name,
-		group:    group,
-		price:    price,
-		rent:     rent,
-		mortgage: mortgage,
-	}
-}
+
 
 func remove (elements []ConsumableCard, elem ConsumableCard) []ConsumableCard{
 	index := 0

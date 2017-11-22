@@ -26,18 +26,14 @@ func main() {
 	}
 
 	communityChest := models.NewCommunityChest()
-	chance := models.NewCommunityChest()
+	chance := models.NewChance()
 	dice := models.NewDice()
 
 	//TODO: Board initialized
 
-	game := &controllers.Game{
-		communityChest,
-		chance,
-		dice,
-		players,
-		bank,
-	}
+	fmt.Println("Initializing game...")
+	game := controllers.NewGame(players, bank, dice, communityChest, chance)
+
 	game.Start()
 
 }

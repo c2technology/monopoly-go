@@ -91,8 +91,8 @@ type basicDeck struct {
 	cards []Card
 }
 
-func (c * basicDeck) Name() string {
-	return c.name
+func (c * basicDeck) String() string {
+	return fmt.Sprintf("%s: %v", c.name, len(c.cards))
 }
 
 func (c *basicDeck) Shuffle(){
