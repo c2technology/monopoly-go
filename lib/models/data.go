@@ -1,4 +1,5 @@
 package models
+
 var playerNames = []string{
 	"James",
 	"John",

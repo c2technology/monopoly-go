@@ -1,9 +1,6 @@
 package models
 
-
-
-
-func remove (elements []ConsumableCard, elem ConsumableCard) []ConsumableCard{
+func remove(elements []ConsumableCard, elem ConsumableCard) []ConsumableCard {
 	index := 0
 	for key, element := range elements {
 		if element == elem {
@@ -15,4 +12,3 @@ func remove (elements []ConsumableCard, elem ConsumableCard) []ConsumableCard{
 	elements = elements[:len(elements)-1]
 	return elements
 }
-

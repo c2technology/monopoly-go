@@ -7,11 +7,10 @@ type Deck interface {
 
 	//Draws a Card from this Deck and gives it to the Player
 	Draw(Player)
-
 }
 
 //Card is a single card that can perform an action with the context of a Player
-type Card interface{
+type Card interface {
 	//Name of the card
 	Name() string
 
@@ -20,7 +19,7 @@ type Card interface{
 }
 
 //Card is a single card that can perform an action with the context of a Player
-type ConsumableCard interface{
+type ConsumableCard interface {
 	Card
 
 	//Uses this Card on the given player
@@ -29,5 +28,3 @@ type ConsumableCard interface{
 	//The cash value of this card
 	Value() int64
 }
-
-

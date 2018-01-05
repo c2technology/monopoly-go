@@ -1,6 +1,6 @@
 package models
 
-//A Space that can be rented
+//Rental is a Space that can be rented
 type Rental interface {
 	Space
 	Group() Group
@@ -14,7 +14,9 @@ type Rental interface {
 	PayoffValue() int64
 }
 
+//Buildable is a Rental that can be build upon
 type Buildable interface {
+	Rental
 	Houses() int
 	Hotels() int
 	BuildHouse()

@@ -14,5 +14,3 @@ type Dice interface {
 	Doubles() bool
 	Value() int
 }
-
-

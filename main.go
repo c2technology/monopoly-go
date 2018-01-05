@@ -2,27 +2,27 @@ package main
 
 import (
 	"fmt"
-	"github.com/c2technology/monopoly-go/lib/models"
-	"os"
-	"bufio"
+	"log"
 	"strconv"
+
 	"github.com/c2technology/monopoly-go/lib/controllers"
+	"github.com/c2technology/monopoly-go/lib/models"
 )
 
 func main() {
-	fmt.Println("Welcome to Monopoly!")
+	log.Printf("Welcome to Monopoly!")
 	//TODO: Initialiez rentals
 	rentals := []models.Rental{}
 
-	bank := models.NewBank(1514000, rentals, 32,  12)
+	bank := models.NewBank(1514000, rentals, 32, 12)
 
 	playerCount := getPlayers()
 
 	players := []models.Player{}
-	for i := 0;	i < playerCount; i++	{
+	for i := 0; i < playerCount; i++ {
 		player := models.NewPlayer(bank)
 		bank.Pay(player, 150000)
-		players[i] = player
+		players = append(players, player)
 	}
 
 	communityChest := models.NewCommunityChest()
@@ -31,7 +31,7 @@ func main() {
 
 	//TODO: Board initialized
 
-	fmt.Println("Initializing game...")
+	log.Printf("Initializing game...")
 	game := controllers.NewGame(players, bank, dice, communityChest, chance)
 
 	game.Start()
@@ -39,13 +39,13 @@ func main() {
 }
 
 func getPlayers() int {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Number of players: ")
-	text, _ := reader.ReadString('\n')
-	if count, err := strconv.Atoi(text); err != nil {
-		fmt.Println("Invalid input. Please provide number.")
+	log.Printf("Number of players: ")
+	text := ""
+	fmt.Scanln(&text)
+	count, err := strconv.Atoi(text)
+	if err != nil || count < 2 {
+		log.Printf("Invalid input. Please provide number.")
 		return getPlayers()
-	} else {
-		return count
 	}
+	return count
 }

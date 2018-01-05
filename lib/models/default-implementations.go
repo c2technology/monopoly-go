@@ -2,22 +2,23 @@ package models
 
 import "fmt"
 import (
-	"math/rand"
 	"log"
+	"math/rand"
 )
 
 type rentalProperty struct {
-	name      string
-	group     Group
-	price     int64
-	rent      int64
-	owner     Proprietor
-	houses    int
-	hotels    int
-	mortgage  int64
-	mortgaged bool
+	name          string
+	group         Group
+	price         int64
+	rent          int64
+	owner         Proprietor
+	houses        int
+	hotels        int
+	mortgage      int64
+	mortgaged     bool
 	buildingPrice int64
 }
+
 func (r *rentalProperty) String() string {
 	return fmt.Sprintf("%v %v - %v", r.name, r.group, r.owner)
 }
@@ -27,7 +28,7 @@ func (r *rentalProperty) DoAction(player Player) error {
 		if player.WantToBuy(r) {
 			bank.SellRental(player, r)
 			return nil
-		} else {
+			//} else {
 			//TODO: Auction
 		}
 	} else {
@@ -51,7 +52,7 @@ func (r *rentalProperty) Proprietor() Proprietor {
 	return r.owner
 }
 func (r *rentalProperty) BuildHouse() {
-	r.houses = r.houses+1
+	r.houses = r.houses + 1
 }
 func (r *rentalProperty) BuildHotel() {
 	r.hotels = r.hotels + 1
@@ -83,19 +84,19 @@ func (r *rentalProperty) Mortgaged() bool {
 }
 
 func (r *rentalProperty) PayoffValue() int64 {
-	return r.mortgage * 1.2
+	return int64(float64(r.mortgage) * 1.2)
 }
 
 type basicDeck struct {
-	name string
+	name  string
 	cards []Card
 }
 
-func (c * basicDeck) String() string {
+func (c *basicDeck) String() string {
 	return fmt.Sprintf("%s: %v", c.name, len(c.cards))
 }
 
-func (c *basicDeck) Shuffle(){
+func (c *basicDeck) Shuffle() {
 	log.Printf("%s was shuffled!", c)
 	dest := make([]Card, len(c.cards))
 	perm := rand.Perm(len(c.cards))
@@ -117,9 +118,9 @@ func (c *basicDeck) Draw(player Player) {
 }
 
 type dice struct {
-	die1 Die
-	die2 Die
-	doubles bool
+	die1      Die
+	die2      Die
+	doubles   bool
 	faceValue int
 }
 
@@ -137,16 +138,16 @@ func (d *dice) Doubles() bool {
 	return d.doubles
 }
 func (d *dice) String() string {
-	return fmt.Sprintf("%s + %s = %s (%s)", d.die1, d.die2, d.faceValue, d.doubles)
+	return fmt.Sprintf("%s + %s = %d (%t)", d.die1, d.die2, d.faceValue, d.doubles)
 }
 
 type die struct {
-	values []int
+	values    []int
 	faceValue int
 }
 
 func (d *die) String() string {
-	return fmt.Sprintf("%s", d.faceValue)
+	return fmt.Sprintf("%d", d.faceValue)
 }
 
 func (d *die) Roll() {
@@ -159,13 +160,13 @@ func (d *die) Value() int {
 
 //Player is a member of the game
 type defaultPlayer struct {
-	bank Bank
-	cash int64
-	name string
+	bank    Bank
+	cash    int64
+	name    string
 	rentals []Rental
-	cards []ConsumableCard
+	cards   []ConsumableCard
 	//	piece GamePiece
-	inJail bool
+	inJail        bool
 	jailRemaining int
 	//	gm GameMaster
 }
@@ -223,8 +224,7 @@ func (p *defaultPlayer) liquidationStrategy(owed int64) {
 	}
 }
 
-
-func (p *defaultPlayer) Receive(cash int64, rentals []Rental, cards []ConsumableCard){
+func (p *defaultPlayer) Receive(cash int64, rentals []Rental, cards []ConsumableCard) {
 	if cash > 0 {
 		p.cash = p.cash + cash
 	}
@@ -241,14 +241,14 @@ func (p *defaultPlayer) WantToBuy(rental Rental) bool {
 	return true
 }
 
-func (p *defaultPlayer) InJail() bool{
+func (p *defaultPlayer) InJail() bool {
 	return p.inJail
 }
 
-func (p *defaultPlayer) SentanceRemaining() int{
+func (p *defaultPlayer) SentanceRemaining() int {
 	return p.jailRemaining
 }
-func (p *defaultPlayer)PostBail(){
+func (p *defaultPlayer) PostBail() {
 	//TODO
 
 }
@@ -283,7 +283,7 @@ func (p *defaultPlayer) liquidateBuilding(group Group) bool {
 			buildings := buildable.Houses() + buildable.Hotels()
 			if buildings > maxBuildings {
 				maxBuildings = buildings
-				sortedRentals[maxBuildings]=rental
+				sortedRentals[maxBuildings] = rental
 			}
 		}
 	}
@@ -291,7 +291,7 @@ func (p *defaultPlayer) liquidateBuilding(group Group) bool {
 	//Sell a building from a rental with the most amount of buildings
 	buildable, ok := sortedRentals[maxBuildings].(Buildable)
 	if ok {
-		if buildable.Hotels() >0 {
+		if buildable.Hotels() > 0 {
 			p.bank.SellHotel(p, buildable)
 		} else {
 			p.bank.SellHouse(p, buildable)
@@ -300,9 +300,9 @@ func (p *defaultPlayer) liquidateBuilding(group Group) bool {
 	return true
 }
 
-func (p *defaultPlayer) declareBankruptcy(collector Collector){
+func (p *defaultPlayer) declareBankruptcy(collector Collector) {
 	collector.Receive(p.cash, p.rentals, p.cards)
-	p.cash =0
+	p.cash = 0
 	p.rentals = nil
 	p.cards = nil
 	//TODO: gm.Eject(p) <-- gm should have the only reference to this player
@@ -313,17 +313,16 @@ func (p *defaultPlayer) String() string {
 	return fmt.Sprintf("%s ($%v)", p.name, p.cash/100)
 }
 
-
 type standardBank struct {
-	name string
-	cash int64
+	name    string
+	cash    int64
 	rentals []Rental
-	houses int
-	hotels int
+	houses  int
+	hotels  int
 }
 
-func (b * standardBank) String() string{
-	return fmt.Sprintf("%s: ($%s) - Houses: %s, Hotels: %s, Properties: %s", b.name, b.cash, b.houses, b.hotels, len(b.rentals))
+func (b *standardBank) String() string {
+	return fmt.Sprintf("%s: ($%d) - Houses: %d, Hotels: %d, Properties: %d", b.name, b.cash, b.houses, b.hotels, len(b.rentals))
 }
 
 func (b *standardBank) Receive(cash int64, rentals []Rental, cards []ConsumableCard) {
@@ -339,7 +338,7 @@ func (b *standardBank) Pay(collector Collector, cash int64) {
 	b.cash = b.cash - cash
 }
 
-func (b *standardBank) SellRental(proprietor Proprietor, rental Rental){
+func (b *standardBank) SellRental(proprietor Proprietor, rental Rental) {
 	found := false
 	for _, owned := range b.rentals {
 		if rental == owned {
@@ -353,7 +352,7 @@ func (b *standardBank) SellRental(proprietor Proprietor, rental Rental){
 	}
 }
 
-func (b *standardBank) BuyHouse(debtor Debtor,rental Buildable){
+func (b *standardBank) BuyHouse(debtor Debtor, rental Buildable) {
 	if b.houses > 0 {
 		debtor.Pay(b, rental.BuildingPrice())
 		b.houses = b.houses - 1
@@ -361,7 +360,7 @@ func (b *standardBank) BuyHouse(debtor Debtor,rental Buildable){
 	}
 }
 
-func (b *standardBank) BuyHotel(debtor Debtor, rental Buildable){
+func (b *standardBank) BuyHotel(debtor Debtor, rental Buildable) {
 	if b.hotels > 0 {
 		debtor.Pay(b, rental.BuildingPrice())
 		b.hotels = b.hotels - 1
@@ -369,19 +368,19 @@ func (b *standardBank) BuyHotel(debtor Debtor, rental Buildable){
 	}
 }
 
-func (b *standardBank) SellHouse(collector Collector, rental Buildable){
+func (b *standardBank) SellHouse(collector Collector, rental Buildable) {
 	rental.DemolishHouse()
-	collector.Receive(rental.BuildingPrice() / 2, nil, nil)
+	collector.Receive(rental.BuildingPrice()/2, nil, nil)
 	b.houses = b.houses + 1
 }
 
-func (b *standardBank) SellHotel(collector Collector, rental Buildable){
+func (b *standardBank) SellHotel(collector Collector, rental Buildable) {
 	rental.DemolishHotel()
 	collector.Receive(rental.BuildingPrice()/2, nil, nil)
-	b.hotels = b.hotels+ 1
+	b.hotels = b.hotels + 1
 }
 
-func (b *standardBank) SellCard(collector Collector, card ConsumableCard){
+func (b *standardBank) SellCard(collector Collector, card ConsumableCard) {
 	collector.Receive(card.Value(), nil, nil)
 	b.cash = b.cash - card.Value()
 }
@@ -395,7 +394,7 @@ func (b *standardBank) Mortgage(collector Collector, rental Rental) {
 func (b *standardBank) Unmortgage(debtor Debtor, rental Rental) {
 	if rental.Mortgaged() {
 		//TODO: Could lead to bankruptcy to bank if called on accidentally or unnecessarily
-		debtor.Pay(b, rental.MortgageValue() * 1.2)
+		debtor.Pay(b, rental.PayoffValue())
 		rental.Mortgage()
 	}
 }
