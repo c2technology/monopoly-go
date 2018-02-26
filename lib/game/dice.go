@@ -1,6 +1,8 @@
-package models
+package game
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Die interface {
 	fmt.Stringer

@@ -2,44 +2,46 @@ package main
 
 import (
 	"fmt"
+	"github.com/c2technology/monopoly-go/lib/card"
+	"github.com/c2technology/monopoly-go/lib/dice"
+	"github.com/c2technology/monopoly-go/lib/game"
+	"github.com/c2technology/monopoly-go/lib/player"
 	"log"
 	"strconv"
-
-	"github.com/c2technology/monopoly-go/lib/controllers"
-	"github.com/c2technology/monopoly-go/lib/models"
+	"github.com/c2technology/monopoly-go/lib/board"
 )
 
 func main() {
 	log.Printf("Welcome to Monopoly!")
-	//TODO: Initialiez rentals
-	rentals := []models.Rental{}
+	//TODO: Initialize rentals
+	var rentals []game.Rental
 
-	bank := models.NewBank(1514000, rentals, 32, 12)
+	bank := player.NewBanker(1514000, rentals, 32, 12)
 
 	playerCount := getPlayers()
 
-	players := []models.Player{}
+	players := []game.Player{}
 	for i := 0; i < playerCount; i++ {
-		player := models.NewPlayer(bank)
+		player := player.NewPlayer(bank)
 		bank.Pay(player, 150000)
 		players = append(players, player)
 	}
 
-	communityChest := models.NewCommunityChest()
-	chance := models.NewChance()
-	dice := models.NewDice()
-
+	communityChest := card.NewCommunityChest(bank)
+	chance := card.NewChance(bank)
+	dice := dice.NewDice()
+	board := board.NewClassicBoard()
 	//TODO: Board initialized
 
 	log.Printf("Initializing game...")
-	game := controllers.NewGame(players, bank, dice, communityChest, chance)
+	game := game.NewGame(players, bank, dice, communityChest, chance)
 
 	game.Start()
 
 }
 
 func getPlayers() int {
-	log.Printf("Number of players: ")
+	log.Printf("Number of player: ")
 	text := ""
 	fmt.Scanln(&text)
 	count, err := strconv.Atoi(text)

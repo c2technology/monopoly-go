@@ -1,4 +1,4 @@
-package models
+package game
 
 //Rental is a Space that can be rented
 type Rental interface {
@@ -12,16 +12,4 @@ type Rental interface {
 	Mortgage()
 	Unmortgage()
 	PayoffValue() int64
-}
-
-//Buildable is a Rental that can be build upon
-type Buildable interface {
-	Rental
-	Houses() int
-	Hotels() int
-	BuildHouse()
-	BuildHotel()
-	DemolishHouse()
-	DemolishHotel()
-	BuildingPrice() int64
 }

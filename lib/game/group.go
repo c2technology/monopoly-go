@@ -1,6 +1,4 @@
-package models
-
-import "fmt"
+package game
 
 type Group string
 
@@ -16,12 +14,3 @@ const (
 	RAILROAD   = Group("RAILROAD")
 	UTILITY    = Group("UTILITY")
 )
-
-//Space is a space on the Board. It could be a Property or could be an Action
-type Space interface {
-	fmt.Stringer
-	DoAction(Player) error
-}
-
-type Board interface {
-}

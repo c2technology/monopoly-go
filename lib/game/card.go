@@ -1,13 +1,4 @@
-package models
-
-//Deck is a collection of Cards
-type Deck interface {
-	//Shuffle this Deck
-	Shuffle()
-
-	//Draws a Card from this Deck and gives it to the Player
-	Draw(Player)
-}
+package game
 
 //Card is a single card that can perform an action with the context of a Player
 type Card interface {
@@ -15,7 +6,7 @@ type Card interface {
 	Name() string
 
 	//Action to perform
-	DoAction(Player)
+	DoAction(GameState, Player)
 }
 
 //Card is a single card that can perform an action with the context of a Player
