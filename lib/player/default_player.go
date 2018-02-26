@@ -7,11 +7,13 @@ import (
 	"math/rand"
 )
 
+//TODO: Add different AI players (aggressive, conservative, etc) with a PlayerFactory that allows for randomization
+
 //Creates a new Player
-func NewPlayer(banker game.Banker) game.Player {
-	player := &defaultPlayer{
-		name:   playerNames[rand.Intn(len(playerNames))],
-		banker: banker,
+func RandomPlayer(banker game.Banker) game.Player {
+	player := &BasicPlayer{
+		Name:   playerNames[rand.Intn(len(playerNames))],
+		Banker: banker,
 		//TODO: Get random strategy
 	}
 	log.Printf("%s has taken a seat!", player)
@@ -221,10 +223,10 @@ var playerNames = []string{
 }
 
 //Player is a member of the game
-type defaultPlayer struct {
-	banker  game.Banker
+type BasicPlayer struct {
+	Banker  game.Banker //TODO: Move banker outta here
 	cash    int64
-	name    string
+	Name    string
 	rentals []game.Rental
 	cards   []game.ConsumableCard
 	//	piece GamePiece
@@ -233,7 +235,7 @@ type defaultPlayer struct {
 	//	gm GameMaster
 }
 
-func (p *defaultPlayer) Pay(collector game.Collector, owed int64) {
+func (p *BasicPlayer) Pay(collector game.Collector, owed int64) {
 	//figure out if we have enough cash
 	if owed > p.cash {
 		//start mortgaging properties
@@ -251,18 +253,18 @@ func (p *defaultPlayer) Pay(collector game.Collector, owed int64) {
 	p.cash = p.cash - owed
 }
 
-func (p *defaultPlayer) liquidationStrategy(owed int64) {
+func (p *BasicPlayer) liquidationStrategy(owed int64) {
 	if owed > p.cash {
 		//liquidate card
 		for _, cardHeld := range p.cards {
-			p.banker.SellCard(p, cardHeld)
+			p.Banker.SellCard(p, cardHeld)
 			p.remove(p.cards, cardHeld)
 		}
 		//mortgage properties
 		groups := make(map[game.Group]interface{})
 		for _, rental := range p.rentals {
 			groups[rental.Group()] = nil
-			p.banker.Mortgage(p, rental)
+			p.Banker.Mortgage(p, rental)
 			if owed <= p.cash {
 				return
 			}
@@ -278,7 +280,7 @@ func (p *defaultPlayer) liquidationStrategy(owed int64) {
 		}
 		//run again to catch new properties available for mortgage
 		for _, rental := range p.rentals {
-			p.banker.Mortgage(p, rental)
+			p.Banker.Mortgage(p, rental)
 			if owed <= p.cash {
 				return
 			}
@@ -286,7 +288,7 @@ func (p *defaultPlayer) liquidationStrategy(owed int64) {
 	}
 }
 
-func (p *defaultPlayer) Receive(cash int64, rentals []game.Rental, cards []game.ConsumableCard) {
+func (p *BasicPlayer) Receive(cash int64, rentals []game.Rental, cards []game.ConsumableCard) {
 	if cash > 0 {
 		p.cash = p.cash + cash
 	}
@@ -298,29 +300,29 @@ func (p *defaultPlayer) Receive(cash int64, rentals []game.Rental, cards []game.
 	}
 }
 
-func (p *defaultPlayer) WantToBuy(rental game.Rental) bool {
+func (p *BasicPlayer) WantToBuy(rental game.Rental) bool {
 	//TODO: Implement BuyerStrategy
 	return true
 }
 
-func (p *defaultPlayer) InJail() bool {
+func (p *BasicPlayer) InJail() bool {
 	return p.inJail
 }
 
-func (p *defaultPlayer) SentenceRemaining() int {
+func (p *BasicPlayer) SentenceRemaining() int {
 	return p.jailRemaining
 }
-func (p *defaultPlayer) PostBail() {
+func (p *BasicPlayer) PostBail() {
 	//TODO
 
 }
 
-func (p *defaultPlayer) Build(group game.Group) {
+func (p *BasicPlayer) Build(group game.Group) {
 	//TODO: Build evenly
 
 }
 
-func (p *defaultPlayer) liquidateBuilding(group game.Group) bool {
+func (p *BasicPlayer) liquidateBuilding(group game.Group) bool {
 	var groupRentals []game.Rental
 
 	//Get the full group
@@ -337,7 +339,8 @@ func (p *defaultPlayer) liquidateBuilding(group game.Group) bool {
 		return false
 	}
 
-	var sortedRentals []game.Rental
+	//Max buildings = 4 Houses + 1 Hotel
+	var sortedRentals [5]game.Rental
 	maxBuildings := int(0)
 	for _, rental := range groupRentals {
 		buildable, ok := rental.(game.Buildable)
@@ -354,15 +357,15 @@ func (p *defaultPlayer) liquidateBuilding(group game.Group) bool {
 	buildable, ok := sortedRentals[maxBuildings].(game.Buildable)
 	if ok {
 		if buildable.Hotels() > 0 {
-			p.banker.SellHotel(p, buildable)
+			p.Banker.SellHotel(p, buildable)
 		} else {
-			p.banker.SellHouse(p, buildable)
+			p.Banker.SellHouse(p, buildable)
 		}
 	}
 	return true
 }
 
-func (p *defaultPlayer) declareBankruptcy(collector game.Collector) {
+func (p *BasicPlayer) declareBankruptcy(collector game.Collector) {
 	collector.Receive(p.cash, p.rentals, p.cards)
 	p.cash = 0
 	p.rentals = nil
@@ -371,11 +374,11 @@ func (p *defaultPlayer) declareBankruptcy(collector game.Collector) {
 
 }
 
-func (p *defaultPlayer) String() string {
-	return fmt.Sprintf("%s ($%v)", p.name, p.cash/100)
+func (p *BasicPlayer) String() string {
+	return fmt.Sprintf("%s ($%v)", p.Name, p.cash/100)
 }
 
-func (p *defaultPlayer) remove(elements []game.ConsumableCard, elem game.ConsumableCard) []game.ConsumableCard {
+func (p *BasicPlayer) remove(elements []game.ConsumableCard, elem game.ConsumableCard) []game.ConsumableCard {
 	index := 0
 	for key, element := range elements {
 		if element == elem {

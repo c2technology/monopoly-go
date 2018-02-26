@@ -2,13 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/c2technology/monopoly-go/lib/card"
-	"github.com/c2technology/monopoly-go/lib/dice"
 	"github.com/c2technology/monopoly-go/lib/game"
 	"github.com/c2technology/monopoly-go/lib/player"
 	"log"
 	"strconv"
-	"github.com/c2technology/monopoly-go/lib/board"
+	"github.com/c2technology/monopoly-go/lib/classic"
 )
 
 func main() {
@@ -16,26 +14,27 @@ func main() {
 	//TODO: Initialize rentals
 	var rentals []game.Rental
 
-	bank := player.NewBanker(1514000, rentals, 32, 12)
+	bank := &player.Banker{Name: "Banker", Cash: 1514000, Rentals: rentals, Houses: 32, Hotels: 12}
 
 	playerCount := getPlayers()
 
-	players := []game.Player{}
+	var players []game.Player
 	for i := 0; i < playerCount; i++ {
-		player := player.NewPlayer(bank)
-		bank.Pay(player, 150000)
-		players = append(players, player)
+		p := player.RandomPlayer(bank)
+		bank.Pay(p, 150000)
+		players = append(players, p)
 	}
 
-	communityChest := card.NewCommunityChest(bank)
-	chance := card.NewChance(bank)
-	dice := dice.NewDice()
-	board := board.NewClassicBoard()
-	//TODO: Board initialized
+	//TODO: Factory with different styles of Monopoly (classic, kid, holiday, etc)
+	board := classic.Board()
+	communityChest := classic.CommunityChest(board, bank)
+	chance := classic.Chance(board, bank)
+	dice := classic.Dice()
+
+	//TODO: board initialized
 
 	log.Printf("Initializing game...")
-	game := game.NewGame(players, bank, dice, communityChest, chance)
-
+	game := classic.Game(board, players, bank, dice, communityChest, chance)
 	game.Start()
 
 }

@@ -4,19 +4,20 @@ import (
 	"github.com/c2technology/monopoly-go/lib/game"
 )
 
-type basicCard struct {
-	name   string
-	action func(game.GameState, game.Player)
+type BasicCard struct {
+	Name   string
+	Action func(game.Board, game.Banker, game.Player)
 }
 
-func NewCard(name string, action func(game.GameState, game.Player)) game.Card {
-	return &basicCard{name: name, action: action}
+func NewCard(name string, action func(game.Board, game.Banker, game.Player)) game.Card {
+	return &BasicCard{Name: name, Action: action}
 }
 
-func (c *basicCard) Name() string {
-	return c.name
+func (c *BasicCard) String() string {
+	return c.Name
 
 }
-func (c *basicCard) DoAction(gameState game.GameState, player game.Player) {
-	gameState.Banker().Pay(player, 200)
+func (c *BasicCard) DoAction(board game.Board, banker game.Banker, player game.Player) {
+	//TODO: Return the action that the game should run. don't do it here.
+	banker.Pay(player, 200)
 }

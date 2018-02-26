@@ -7,12 +7,12 @@ import (
 	"math/rand"
 )
 
-func NewDice() game.Dice {
+func Dice() game.Dice {
 	dice := &dice{
 		die1: newDie(6),
 		die2: newDie(6),
 	}
-	log.Printf("Dice initialzied: %v", dice)
+	log.Printf("dice initialzied: %v", dice)
 	return dice
 
 }
@@ -20,7 +20,7 @@ func newDie(sides int) game.Die {
 	if sides < 3 {
 		sides = 3
 	}
-	values := []int{}
+	var values []int
 	for i := 0; i < sides; i++ {
 		values = append(values, i+1)
 	}

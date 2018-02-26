@@ -1,12 +1,13 @@
 package game
 
+import "fmt"
+
 //Card is a single card that can perform an action with the context of a Player
 type Card interface {
-	//Name of the card
-	Name() string
+	fmt.Stringer
 
 	//Action to perform
-	DoAction(GameState, Player)
+	DoAction(Board, Banker, Player)
 }
 
 //Card is a single card that can perform an action with the context of a Player

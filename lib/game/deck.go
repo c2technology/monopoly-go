@@ -1,6 +1,6 @@
 package game
 
-//Deck is a collection of Cards
+//Deck is a collection of cards
 type Deck interface {
 	//Shuffle this Deck
 	Shuffle()
